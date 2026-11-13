@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" width="960" height="330" role="img" aria-labelledby="t d">
+  <title id="t">How infra-topology-generator works</title>
+  <desc id="d">A plain-English network description, typed or read from a file, is wrapped in a system prompt that gives the JSON structure and IEC 62443 design rules. Claude returns topology JSON with nodes, connections and zones. main.py strips any code fences and parses it; invalid JSON stops the run. validator.py then runs three rule checks and prints a compliance report, followed by the topology JSON on screen or in a file. The rules use the IEC 62443 zone model: corporate IT, DMZ, supervisory, control and field. OT nodes must not be in corporate IT, a DMZ is required when IT and OT zones are both present, and every connection that crosses zones must be encrypted.</desc>
+  <style>
+    :root { --ink:#1f2937; --sub:#57606a; --line:#d0d7de; --card:#ffffff; --on:#4f46e5; --tint:#eef2ff; --ok:#1a7f37; --bad:#cf222e; }
+    @media (prefers-color-scheme: dark) {
+      :root { --ink:#e6edf3; --sub:#9198a1; --line:#3d444d; --card:#161b22; --on:#818cf8; --tint:#1e1b4b; --ok:#3fb950; --bad:#f85149; }
+    }
+    text { font-family: Inter, "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif; }
+    .lane  { font-size:12px; font-weight:700; fill:var(--sub); letter-spacing:.06em; }
+    .title { font-size:13.5px; font-weight:700; fill:var(--ink); text-anchor:middle; }
+    .sub   { font-size:10.5px; fill:var(--sub); text-anchor:middle; }
+    .rule  { font-size:11.5px; font-weight:700; fill:var(--ink); }
+    .rsub  { font-size:10.5px; fill:var(--sub); }
+    .ok    { font-size:11px; font-weight:600; fill:var(--ok); text-anchor:middle; }
+    .bad   { font-size:11px; font-weight:600; fill:var(--bad); text-anchor:middle; }
+    .node  { fill:var(--card); stroke:var(--line); stroke-width:1.5; }
+    .hl    { fill:var(--tint); stroke:var(--on); stroke-width:1.5; }
+    .wire  { stroke:var(--line); stroke-width:1.5; fill:none; }
+    .head  { fill:var(--line); }
+    .dot   { fill:var(--on); }
+    .t1 { animation: g1 7s infinite ease-in-out; }
+    @keyframes g1 {
+      0%,5%   { transform:translateX(90px); }  14%,19% { transform:translateX(246px); }
+      28%,33% { transform:translateX(402px); } 42%,47% { transform:translateX(558px); }
+      56%,61% { transform:translateX(714px); } 70%,100%{ transform:translateX(870px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .t1 { animation:none; } }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0 0 L10 5 L0 10z"/></marker>
+  </defs>
+
+  <!-- Lane 1 -->
+  <text class="lane" x="20" y="26">1 · ONE RUN  (main.py)</text>
+  <g>
+    <rect class="node" x="20"  y="40" width="140" height="72" rx="10"/>
+    <text class="title" x="90"  y="68">Description</text><text class="sub" x="90"  y="86">plain English</text><text class="sub" x="90" y="100">typed or --input file</text>
+    <rect class="node" x="176" y="40" width="140" height="72" rx="10"/>
+    <text class="title" x="246" y="68">Prompt</text><text class="sub" x="246" y="86">JSON structure +</text><text class="sub" x="246" y="100">IEC 62443 design rules</text>
+    <rect class="node" x="332" y="40" width="140" height="72" rx="10"/>
+    <text class="title" x="402" y="68">Claude API</text><text class="sub" x="402" y="86">claude-opus-4-5</text><text class="sub" x="402" y="100">returns topology JSON</text>
+    <rect class="node" x="488" y="40" width="140" height="72" rx="10"/>
+    <text class="title" x="558" y="68">Parse JSON</text><text class="sub" x="558" y="86">strip code fences</text><text class="bad" x="558" y="101">✗ invalid → stop</text>
+    <rect class="hl"   x="644" y="40" width="140" height="72" rx="10"/>
+    <text class="title" x="714" y="68">Rule checks</text><text class="sub" x="714" y="86">validator.py</text><text class="sub" x="714" y="100">3 rules, plain code</text>
+    <rect class="node" x="800" y="40" width="140" height="72" rx="10"/>
+    <text class="title" x="870" y="64">Report + JSON</text>
+    <text class="ok"  x="870" y="82">✓ compliant</text>
+    <text class="bad" x="870" y="97">✗ violations listed</text>
+    <path class="wire" d="M160 76 H174" marker-end="url(#a)"/>
+    <path class="wire" d="M316 76 H330" marker-end="url(#a)"/>
+    <path class="wire" d="M472 76 H486" marker-end="url(#a)"/>
+    <path class="wire" d="M628 76 H642" marker-end="url(#a)"/>
+    <path class="wire" d="M784 76 H798" marker-end="url(#a)"/>
+    <circle class="dot t1" cx="0" cy="40" r="5"/>
+  </g>
+  <text class="sub" x="480" y="134">stdout, or --output topology.json · --no-validate skips the checks</text>
+
+  <!-- Lane 2 -->
+  <text class="lane" x="20" y="166">2 · WHAT THE CHECKS LOOK AT  (IEC 62443 zone model, schema.py)</text>
+  <g>
+    <rect class="node" x="20"    y="180" width="170" height="52" rx="10"/>
+    <text class="title" x="105"   y="202">corporate_it</text><text class="sub" x="105"   y="219">Level 4/5 · enterprise IT</text>
+    <rect class="hl"   x="207.5" y="180" width="170" height="52" rx="10"/>
+    <text class="title" x="292.5" y="202">dmz</text><text class="sub" x="292.5" y="219">Level 3.5</text>
+    <rect class="node" x="395"   y="180" width="170" height="52" rx="10"/>
+    <text class="title" x="480"   y="202">supervisory</text><text class="sub" x="480"   y="219">Level 3 · SCADA / DCS</text>
+    <rect class="node" x="582.5" y="180" width="170" height="52" rx="10"/>
+    <text class="title" x="667.5" y="202">control</text><text class="sub" x="667.5" y="219">Level 2 · control systems</text>
+    <rect class="node" x="770"   y="180" width="170" height="52" rx="10"/>
+    <text class="title" x="855"   y="202">field</text><text class="sub" x="855"   y="219">Level 1/0 · field devices</text>
+    <path class="wire" d="M190 206 H205.5"/>
+    <path class="wire" d="M377.5 206 H393"/>
+    <path class="wire" d="M565 206 H580.5"/>
+    <path class="wire" d="M752.5 206 H768"/>
+  </g>
+  <rect class="node" x="20"  y="252" width="296" height="62" rx="10"/>
+  <text class="rule" x="36" y="274">OT-ISOLATION</text>
+  <text class="rsub" x="36" y="292">PLC, RTU, HMI and historian are never</text>
+  <text class="rsub" x="36" y="306">in corporate_it</text>
+  <rect class="node" x="332" y="252" width="296" height="62" rx="10"/>
+  <text class="rule" x="348" y="274">DMZ-REQUIRED</text>
+  <text class="rsub" x="348" y="292">corporate_it and any OT zone present</text>
+  <text class="rsub" x="348" y="306">→ a dmz zone must exist</text>
+  <rect class="node" x="644" y="252" width="296" height="62" rx="10"/>
+  <text class="rule" x="660" y="274">ENCRYPTED-CROSS-ZONE</text>
+  <text class="rsub" x="660" y="292">every connection between two different</text>
+  <text class="rsub" x="660" y="306">zones has encrypted: true</text>
+</svg>
